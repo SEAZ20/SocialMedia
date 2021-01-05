@@ -7,6 +7,7 @@ using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.QueryFilter;
 using SocialMedia.Infrastucture.Repositories;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SocialMedia.Api.Controllers
@@ -23,12 +24,14 @@ namespace SocialMedia.Api.Controllers
             _mapper = mapper;
         }
         [HttpGet()]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<PostDto>>))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetPosts([FromQuery]PostQueryFilter filters)
         {
             var posts = await _postService.GetPosts(filters);
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             var response = new ApiResponse<IEnumerable<PostDto>>(postsDto);
-            return Ok (response);
+            return Ok(response);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(int id)

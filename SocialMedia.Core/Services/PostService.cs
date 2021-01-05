@@ -31,8 +31,21 @@ namespace SocialMedia.Core.Services
         }
 
         public async Task<IEnumerable<Post>> GetPosts(PostQueryFilter filters)
-        {
-            return await _postRepository.GetPosts();
+       {
+            var posts= await _postRepository.GetPosts();
+            if (filters.UserId !=null)
+            {
+                posts = posts.Where(x => x.UserId == filters.UserId);
+            }
+            if (filters.Date != null)
+            {
+                posts = posts.Where(x => x.Date.ToShortDateString() == filters.Date?.ToShortDateString());
+            }
+            if (filters.Description != null)
+            {
+                posts = posts.Where(x => x.Description.ToLower().Contains(filters.Description.ToLower()));
+            }
+            return posts;
         }
 
       

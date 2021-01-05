@@ -13,6 +13,7 @@ namespace SocialMedia.Infrastucture.Mappings
         {
             CreateMap<Post, PostDto>();
             CreateMap<PostDto, Post>();
+
         }
     }
 }
