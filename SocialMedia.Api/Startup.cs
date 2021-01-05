@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.Services;
 using SocialMedia.Infrastucture.Data;
 using SocialMedia.Infrastucture.Filters;
 using SocialMedia.Infrastucture.Repositories;
@@ -27,7 +28,9 @@ namespace SocialMedia.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddControllers().AddNewtonsoftJson(options => {
+            services.AddControllers(options=> {
+                options.Filters.Add<GlobalExeptionFilter>();
+            }).AddNewtonsoftJson(options => {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             }).ConfigureApiBehaviorOptions(options =>
                 {
@@ -35,7 +38,13 @@ namespace SocialMedia.Api
                 });
             services.AddDbContext<SocialMediaContext>(option =>
             option.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
+
+            //INTERFACES
+            services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IPostRepository, PostRepository>();
+            services.AddTransient<IPostService, PostService>();
+
+
             services.AddMvc(Options =>
             {
                 Options.Filters.Add<ValidationFilter>();
