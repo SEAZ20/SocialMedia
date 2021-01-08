@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SocialMedia.Api.Response;
+using SocialMedia.Core.CustomEntites;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
@@ -26,11 +28,29 @@ namespace SocialMedia.Api.Controllers
         [HttpGet()]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<PostDto>>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetPosts([FromQuery]PostQueryFilter filters)
+        public IActionResult GetPosts([FromQuery]PostQueryFilter filters)
         {
-            var posts = await _postService.GetPosts(filters);
+            var posts =  _postService.GetPosts(filters);
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
-            var response = new ApiResponse<IEnumerable<PostDto>>(postsDto);
+            // var response = new ApiResponse<IEnumerable<PostDto>>(postsDto);
+
+            var metadata = new Metadata
+            {
+                TotalCount = posts.TotalCount,
+                PageSize = posts.PageSize,
+                CurrentPage = posts.CurrentPage,
+                TotalPages = posts.TotalPages,
+                HasNextPage = posts.HasNextPage,
+                HasPreviousPage = posts.HasPreviousPage,
+              //  NextPageUrl = posts.NextPageNumber,
+               // PreviousPageUrl = posts.PreviousPageNumber,
+            };
+            var response = new ApiResponse<IEnumerable<PostDto>>(postsDto)
+            {
+                Meta = metadata
+            };
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
             return Ok(response);
         }
         [HttpGet("{id}")]

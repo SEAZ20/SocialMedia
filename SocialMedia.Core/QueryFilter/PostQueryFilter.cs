@@ -13,8 +13,8 @@ namespace SocialMedia.Core.QueryFilter
 
         public string Description { get; set; }
 
-       // public int PageSize { get; set; }
+        public int PageSize { get; set; }
 
-        //public int PageNumber { get; set; }
+        public int PageNumber { get; set; }
     }
 }
